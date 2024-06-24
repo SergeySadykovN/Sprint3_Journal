@@ -150,7 +150,7 @@ class TrainingLogApp:
 
 def main():
     root = tk.Tk()
-    app = TrainingLogApp(root)
+    TrainingLogApp(root)
     root.mainloop()
 
 
