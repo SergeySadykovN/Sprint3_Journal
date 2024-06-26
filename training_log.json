@@ -4,5 +4,23 @@
         "exercise": "sdfs",
         "weight": "213",
         "repetitions": "3"
+    },
+    {
+        "date": "2024-06-24 12:06:27",
+        "exercise": "\u043f\u0440\u0435\u0441",
+        "weight": "12",
+        "repetitions": "20"
+    },
+    {
+        "date": "2024-06-24 12:06:37",
+        "exercise": "\u043f\u0440\u0435\u0441",
+        "weight": "23",
+        "repetitions": "24"
+    },
+    {
+        "date": "2024-06-24 12:06:45",
+        "exercise": "\u043f\u0440\u0435\u0441",
+        "weight": "345",
+        "repetitions": "34"
     }
 ]

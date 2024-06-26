@@ -8,7 +8,7 @@ from typing import List, Dict, Any
 data_file = 'training_log.json'
 
 
-def load_data():
+def load_data() -> List[Dict[str, Any]]:
     """Загрузка данных о тренировках из файла."""
     try:
         with open(data_file, 'r') as file:
@@ -17,19 +17,19 @@ def load_data():
         return []
 
 
-def save_data(data):
+def save_data(data: List[Dict[str, Any]]) -> None:
     """Сохранение данных о тренировках в файл."""
     with open(data_file, 'w') as file:
         json.dump(data, file, indent=4)
 
 
 class TrainingLogApp:
-    def __init__(self, root: tk.Tk):
+    def __init__(self, root: tk.Tk) -> None:
         self.root = root
         root.title("Дневник тренировок")
         self.create_widgets()
 
-    def create_widgets(self):
+    def create_widgets(self) -> None:
         # Виджеты для ввода данных
         self.exercise_label = ttk.Label(self.root, text="Упражнение:")
         self.exercise_label.grid(column=0, row=0, sticky=tk.W, padx=5, pady=5)
@@ -68,10 +68,20 @@ class TrainingLogApp:
         self.to_date_entry = ttk.Entry(self.root)
         self.to_date_entry.grid(column=1, row=6, sticky=tk.EW, padx=5, pady=5)
 
-        self.filter_button = ttk.Button(self.root, text="Фильтровать записи", command=self.filter_records)
-        self.filter_button.grid(column=0, row=7, columnspan=2, pady=10)
+        self.filter_date_button = ttk.Button(self.root, text="Фильтровать по дате", command=self.filter_records_by_date)
+        self.filter_date_button.grid(column=0, row=7, columnspan=2, pady=10)
 
-    def add_entry(self):
+        # Виджеты для фильтрации по упражнению
+        self.filter_exercise_label = ttk.Label(self.root, text="Фильтровать по упражнению:")
+        self.filter_exercise_label.grid(column=0, row=8, sticky=tk.W, padx=5, pady=5)
+
+        self.filter_exercise_entry = ttk.Entry(self.root)
+        self.filter_exercise_entry.grid(column=1, row=8, sticky=tk.EW, padx=5, pady=5)
+
+        self.filter_exercise_button = ttk.Button(self.root, text="Фильтровать по упражнению", command=self.filter_records_by_exercise)
+        self.filter_exercise_button.grid(column=0, row=9, columnspan=2, pady=10)
+
+    def add_entry(self) -> None:
         date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         exercise = self.exercise_entry.get()
         weight = self.weight_entry.get()
@@ -98,11 +108,11 @@ class TrainingLogApp:
         self.repetitions_entry.delete(0, tk.END)
         messagebox.showinfo("Успешно", "Запись успешно добавлена!")
 
-    def view_records(self):
+    def view_records(self) -> None:
         data = load_data()
         self.show_records(data)
 
-    def filter_records(self):
+    def filter_records_by_date(self) -> None:
         """
         Фильтрация записей по дате. Пользователь вводит начальную и конечную даты,
         и отображаются только те записи, которые попадают в этот диапазон.
@@ -121,11 +131,24 @@ class TrainingLogApp:
             return
 
         data = load_data()
-        filtered_data = [entry for entry in data if
-                         from_date <= datetime.strptime(entry['date'], '%Y-%m-%d %H:%M:%S') <= to_date]
+        filtered_data = [entry for entry in data if from_date <= datetime.strptime(entry['date'], '%Y-%m-%d %H:%M:%S') <= to_date]
         self.show_records(filtered_data)
 
-    def show_records(self, data: List[Dict[str, Any]]):
+    def filter_records_by_exercise(self) -> None:
+        """
+        Фильтрация записей по упражнению. Пользователь вводит название упражнения,
+        и отображаются только те записи, которые соответствуют этому названию.
+        """
+        exercise_filter = self.filter_exercise_entry.get().strip().lower()
+        if not exercise_filter:
+            messagebox.showerror("Ошибка", "Введите название упражнения для фильтрации!")
+            return
+
+        data = load_data()
+        filtered_data = [entry for entry in data if entry['exercise'].strip().lower() == exercise_filter]
+        self.show_records(filtered_data)
+
+    def show_records(self, data: List[Dict[str, Any]]) -> None:
         """
         Отображение записей в новом окне. Создается новое окно с таблицей,
         в которой перечислены все записи.
@@ -148,7 +171,7 @@ class TrainingLogApp:
         tree.pack(expand=True, fill=tk.BOTH)
 
 
-def main():
+def main() -> None:
     root = tk.Tk()
     TrainingLogApp(root)
     root.mainloop()
