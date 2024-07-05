@@ -3,6 +3,7 @@ from tkinter import ttk, Toplevel, messagebox
 import json
 from datetime import datetime
 from typing import List, Dict, Any
+import csv
 
 # Файл для сохранения данных
 data_file = 'training_log.json'
@@ -78,8 +79,13 @@ class TrainingLogApp:
         self.filter_exercise_entry = ttk.Entry(self.root)
         self.filter_exercise_entry.grid(column=1, row=8, sticky=tk.EW, padx=5, pady=5)
 
-        self.filter_exercise_button = ttk.Button(self.root, text="Фильтровать по упражнению", command=self.filter_records_by_exercise)
+        self.filter_exercise_button = ttk.Button(self.root, text="Фильтровать по упражнению",
+                                                 command=self.filter_records_by_exercise)
         self.filter_exercise_button.grid(column=0, row=9, columnspan=2, pady=10)
+
+        # Кнопка для экспорта в CSV
+        self.export_button = ttk.Button(self.root, text="Экспорт в файл", command=self.export_to_csv)
+        self.export_button.grid(column=0, row=10, columnspan=2, pady=10)
 
     def add_entry(self) -> None:
         date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -131,7 +137,8 @@ class TrainingLogApp:
             return
 
         data = load_data()
-        filtered_data = [entry for entry in data if from_date <= datetime.strptime(entry['date'], '%Y-%m-%d %H:%M:%S') <= to_date]
+        filtered_data = [entry for entry in data if
+                         from_date <= datetime.strptime(entry['date'], '%Y-%m-%d %H:%M:%S') <= to_date]
         self.show_records(filtered_data)
 
     def filter_records_by_exercise(self) -> None:
@@ -169,6 +176,20 @@ class TrainingLogApp:
             tree.insert('', tk.END, values=(entry['date'], entry['exercise'], entry['weight'], entry['repetitions']))
 
         tree.pack(expand=True, fill=tk.BOTH)
+
+    def export_to_csv(self):
+        "Экспорт данных от тренировках в файл.csv"
+        data = load_data()
+        if not data:
+            messagebox.showerror("Error", "Нет данных для экспорта")
+        try:
+            with open('training_log.csv', 'w', newline='', encoding='utf8') as file:
+                writer = csv.DictWriter(file, fieldnames=['date', 'exercise', 'weight', 'repetitions'])
+                writer.writeheader()
+                writer.writerows(data)
+            messagebox.showinfo('Успешно', 'Данные успешно экспортированы в training_log.csv')
+        except Exception as e:
+            messagebox.showerror('Ошибка', f'Ошибка при экспорте данных: {e}')
 
 
 def main() -> None:
