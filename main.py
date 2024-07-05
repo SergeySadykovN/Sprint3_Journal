@@ -39,6 +39,26 @@ def export_to_csv():
         messagebox.showerror('Ошибка', f'Ошибка при экспорте данных: {e}')
 
 
+def import_from_csv():
+    "Ипорт данных от тренировках из файла.csv"
+    file_path = filedialog.askopenfilename(
+        title='Выберите файл',
+        filetypes=(('CSV file', '*csv'), ('Все файлы', '*.*'))
+    )
+    if not file_path:
+        return
+    try:
+        with open(file_path, 'r', newline='', encoding='utf8') as file:
+            reader = csv.DictReader(file)
+            new_data = [row for row in reader]
+        data = load_data()
+        data.extend(new_data)
+        save_data(data)
+        messagebox.showinfo('Успешно', 'Данные успешно импортированы из CSV файла')
+    except Exception as e:
+        messagebox.showerror('Ошибка', 'Ошибка при мипорте данных из файла')
+
+
 class TrainingLogApp:
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
@@ -101,6 +121,10 @@ class TrainingLogApp:
         # Кнопка для экспорта в CSV
         self.export_button = ttk.Button(self.root, text="Экспорт в файл", command=export_to_csv)
         self.export_button.grid(column=0, row=10, columnspan=2, pady=10)
+
+        # Кнопка для импорта из файла
+        self.import_button = ttk.Button(self.root, text="Импорт из файла", command=import_from_csv)
+        self.import_button.grid(column=0, row=11, columnspan=2, pady=10)
 
     def add_entry(self) -> None:
         date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
