@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, Toplevel, messagebox
+from tkinter import ttk, Toplevel, messagebox, filedialog
 import json
 from datetime import datetime
 from typing import List, Dict, Any
@@ -22,6 +22,21 @@ def save_data(data: List[Dict[str, Any]]) -> None:
     """Сохранение данных о тренировках в файл."""
     with open(data_file, 'w') as file:
         json.dump(data, file, indent=4)
+
+
+def export_to_csv():
+    "Экспорт данных от тренировках в файл.csv"
+    data = load_data()
+    if not data:
+        messagebox.showerror("Error", "Нет данных для экспорта")
+    try:
+        with open('training_log.csv', 'w', newline='', encoding='utf8') as file:
+            writer = csv.DictWriter(file, fieldnames=['date', 'exercise', 'weight', 'repetitions'])
+            writer.writeheader()
+            writer.writerows(data)
+        messagebox.showinfo('Успешно', 'Данные успешно экспортированы в training_log.csv')
+    except Exception as e:
+        messagebox.showerror('Ошибка', f'Ошибка при экспорте данных: {e}')
 
 
 class TrainingLogApp:
@@ -84,7 +99,7 @@ class TrainingLogApp:
         self.filter_exercise_button.grid(column=0, row=9, columnspan=2, pady=10)
 
         # Кнопка для экспорта в CSV
-        self.export_button = ttk.Button(self.root, text="Экспорт в файл", command=self.export_to_csv)
+        self.export_button = ttk.Button(self.root, text="Экспорт в файл", command=export_to_csv)
         self.export_button.grid(column=0, row=10, columnspan=2, pady=10)
 
     def add_entry(self) -> None:
@@ -176,20 +191,6 @@ class TrainingLogApp:
             tree.insert('', tk.END, values=(entry['date'], entry['exercise'], entry['weight'], entry['repetitions']))
 
         tree.pack(expand=True, fill=tk.BOTH)
-
-    def export_to_csv(self):
-        "Экспорт данных от тренировках в файл.csv"
-        data = load_data()
-        if not data:
-            messagebox.showerror("Error", "Нет данных для экспорта")
-        try:
-            with open('training_log.csv', 'w', newline='', encoding='utf8') as file:
-                writer = csv.DictWriter(file, fieldnames=['date', 'exercise', 'weight', 'repetitions'])
-                writer.writeheader()
-                writer.writerows(data)
-            messagebox.showinfo('Успешно', 'Данные успешно экспортированы в training_log.csv')
-        except Exception as e:
-            messagebox.showerror('Ошибка', f'Ошибка при экспорте данных: {e}')
 
 
 def main() -> None:
